@@ -1,13 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Traveler Dashboard — Localnest</title>
   <link rel="stylesheet" href="css/style.css" />
-</head>
-<body data-page="traveler-dashboard">
 
+  <style>
+    body[data-page="traveler-dashboard"] {
+      background: #F1F5F9;
+      color: #1E293B;
+    }
+
+    .app-shell {
+      background: #F1F5F9;
+    }
+
+    .sidebar {
+      background: #172B4D;
+      color: #FFFFFF;
+      border-right: 1px solid #263D60;
+    }
+
+    .sidebar .brand-logo {
+      color: #FFFFFF;
+    }
+
+    .sidebar .brand-logo-icon {
+      background: #2563EB;
+      color: #FFFFFF;
+      border-radius: 8px;
+    }
+
+    .sidebar-nav {
+      gap: 8px;
+    }
+
+    .sidebar-link {
+      color: #CBD5E1;
+      border-radius: 8px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .sidebar-link:hover {
+      background: #263D60;
+      color: #FFFFFF;
+    }
+
+    .sidebar-link.active {
+      background: #2563EB;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid #334967;
+    }
+
+    .topbar {
+      background: #FFFFFF;
+      border-bottom: 1px solid #E2E8F0;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    }
+
+    .topbar-title {
+      color: #172B4D;
+      font-weight: 700;
+    }
+
+    .topbar-user-name {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .avatar-circle {
+      background: #DBEAFE;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      font-weight: 700;
+    }
+
+    .dashboard-content {
+      background: #F1F5F9;
+    }
+
+    .page-title {
+      color: #172B4D;
+      font-weight: 700;
+    }
+
+    .page-subtitle {
+      color: #64748B;
+    }
+
+    .card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .card-header {
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      color: #172B4D;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      color: #64748B;
+    }
+
+    .form-label {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .form-control,
+    .cost-input-row input {
+      background: #F8FAFC;
+      color: #1E293B;
+      border: 1px solid #CBD5E1;
+      border-radius: 7px;
+    }
+
+    .form-control:focus,
+    .cost-input-row input:focus {
+      background: #FFFFFF;
+      border-color: #2563EB;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-hint {
+      color: #64748B;
+    }
+
+    .btn-primary {
+      background: #2563EB;
+      color: #FFFFFF;
+      border: 1px solid #2563EB;
+      border-radius: 7px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: #1D4ED8;
+      border-color: #1D4ED8;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn-remove {
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+      border-radius: 6px;
+    }
+
+    .btn-remove:hover {
+      background: #FEE2E2;
+    }
+
+    .itinerary-item {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 9px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .itinerary-info-title {
+      color: #1E293B;
+      font-weight: 600;
+    }
+
+    .itinerary-info-meta {
+      color: #64748B;
+    }
+
+    .day-pill {
+      background: #DBEAFE;
+      color: #1D4ED8;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .itinerary-price {
+      color: #172B4D;
+      font-weight: 700;
+    }
+
+    .badge-role {
+      background: #DBEAFE;
+      color: #1D4ED8;
+    }
+
+    .badge-info {
+      background: #E0F2FE;
+      color: #0369A1;
+    }
+
+    .badge-neutral {
+      background: #F1F5F9;
+      color: #475569;
+    }
+
+    .cost-input-row {
+      color: #475569;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 12px 0;
+    }
+
+    .split-summary-box {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .split-summary-row {
+      color: #334155;
+    }
+
+    .split-per-person-row {
+      border-top: 1px solid #BFDBFE;
+      margin-top: 12px;
+      padding-top: 12px;
+    }
+
+    .split-per-person-label {
+      color: #1E40AF;
+      font-weight: 600;
+    }
+
+    .split-per-person-value {
+      color: #1D4ED8;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .negotiation-grid {
+      gap: 20px;
+    }
+
+    .conv-list-header {
+      color: #172B4D;
+      font-weight: 700;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 12px;
+    }
+
+    .conv-item {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 9px;
+      padding: 13px;
+      margin-bottom: 10px;
+      transition: 0.2s ease;
+    }
+
+    .conv-item:hover {
+      background: #F8FAFC;
+      border-color: #BFDBFE;
+    }
+
+    .conv-item.active {
+      background: #EFF6FF;
+      border-color: #93C5FD;
+    }
+
+    .conv-name {
+      color: #1E293B;
+      font-weight: 600;
+    }
+
+    .conv-role,
+    .conv-time,
+    .conv-preview,
+    .conv-listing {
+      color: #64748B;
+    }
+
+    .chat-panel {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #F8FAFC;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 15px;
+    }
+
+    .chat-messages {
+      background: #FFFFFF;
+    }
+
+    .chat-bubble-wrap.outgoing .chat-bubble {
+      background: #2563EB;
+      color: #FFFFFF;
+      border-radius: 12px 12px 2px 12px;
+    }
+
+    .chat-bubble-wrap.incoming .chat-bubble {
+      background: #F1F5F9;
+      color: #1E293B;
+      border-radius: 12px 12px 12px 2px;
+    }
+
+    .chat-timestamp {
+      color: #94A3B8;
+    }
+
+    .chat-composer {
+      background: #F8FAFC;
+      border-top: 1px solid #E2E8F0;
+      padding: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-traveler-top {
+        grid-template-columns: 1fr;
+      }
+
+      .negotiation-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .itinerary-item {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body data-page="traveler-dashboard">
   <div class="app-shell">
     <aside class="sidebar">
       <div class="sidebar-brand">
@@ -98,7 +439,6 @@
         </div>
 
         <div class="grid-traveler-top">
-
           <section id="itineraryBuilderCard" class="card" aria-labelledby="itineraryHeading">
             <div class="card-header">
               <div>
@@ -336,6 +676,7 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="text-right">
                   <div style="font-size: 0.72rem; color: var(--text-muted);">Itinerary price</div>
                   <div id="chatHeaderPrice" style="font-size: 0.95rem; font-weight: 800;">&#2547;240.00</div>
@@ -404,4 +745,5 @@
 
   <script src="js/main.js"></script>
 </body>
+
 </html>
