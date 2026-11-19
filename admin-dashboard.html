@@ -1,34 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!--
-    ==========================================================================
-    PAGE 8: ADMINISTRATOR PANEL (admin-dashboard.html)
-    Project: Local Nest - Integrated Homestay & Local Experience Booking Platform
-    Course: CSC 3215: Web Technologies (AIUB)
-    Description:
-    Implements the 3 core Administrator (System Manager) features:
-      10. User and Listing Verification (Review host listings, guide
-          certificates, and tour packages with preview modal and
-          Approve & Publish / Reject controls).
-      11. Booking Dispute Management (Select active disputes to inspect
-          complaint details and saved negotiation history, then record a
-          resolution for Traveler or Host/Guide).
-      12. Platform Commission Management (Set platform commission rate % and
-          view live automatic fee/net earnings calculation).
-    ==========================================================================
-  -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel — Localnest</title>
   <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    :root {
+      --admin-primary: #2563eb;
+      --admin-primary-dark: #1d4ed8;
+      --admin-bg: #f5f7fb;
+      --admin-surface: #ffffff;
+      --admin-text: #172033;
+      --admin-muted: #64748b;
+      --admin-border: #e2e8f0;
+      --admin-sidebar: #17243a;
+      --admin-sidebar-hover: #243650;
+      --admin-radius: 12px;
+      --admin-shadow: 0 4px 18px rgba(15, 23, 42, .05);
+    }
+
+    body[data-page="admin-dashboard"] {
+      margin: 0;
+      background: var(--admin-bg);
+      color: var(--admin-text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    body[data-page="admin-dashboard"] * {
+      box-sizing: border-box;
+    }
+
+    body[data-page="admin-dashboard"] .app-shell {
+      min-height: 100vh;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar {
+      width: 250px;
+      background: var(--admin-sidebar);
+      color: #e2e8f0;
+      padding: 24px 16px;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-brand {
+      padding: 0 12px 28px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 22px;
+    }
+
+    body[data-page="admin-dashboard"] .brand-logo {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background .2s, color .2s;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-link svg {
+      width: 19px;
+      height: 19px;
+      flex: 0 0 19px;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-link:hover,
+    body[data-page="admin-dashboard"] .sidebar-link.active {
+      color: #fff;
+      background: var(--admin-sidebar-hover);
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-link.active {
+      box-shadow: inset 3px 0 #60a5fa;
+    }
+
+    body[data-page="admin-dashboard"] .sidebar-footer {
+      margin-top: auto;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    body[data-page="admin-dashboard"] .main-wrapper {
+      min-width: 0;
+      flex: 1;
+    }
+
+    body[data-page="admin-dashboard"] .topbar {
+      min-height: 72px;
+      padding: 14px 32px;
+      background: #fff;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    body[data-page="admin-dashboard"] .topbar-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--admin-text);
+    }
+
+    body[data-page="admin-dashboard"] .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    body[data-page="admin-dashboard"] .topbar-user-name {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    body[data-page="admin-dashboard"] .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    body[data-page="admin-dashboard"] .dashboard-content {
+      width: min(100%, 1500px);
+      margin: 0 auto;
+      padding: 30px 32px 48px;
+    }
+
+    body[data-page="admin-dashboard"] .page-header {
+      margin-bottom: 24px;
+    }
+
+    body[data-page="admin-dashboard"] .page-title {
+      margin: 0 0 7px;
+      color: #172033;
+      font-size: clamp(24px, 3vw, 30px);
+      line-height: 1.25;
+      font-weight: 750;
+    }
+
+    body[data-page="admin-dashboard"] .page-subtitle {
+      margin: 0;
+      color: var(--admin-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    body[data-page="admin-dashboard"] .card {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius);
+      box-shadow: var(--admin-shadow);
+      padding: 24px;
+      margin-bottom: 22px;
+    }
+
+    body[data-page="admin-dashboard"] .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    body[data-page="admin-dashboard"] .card-title {
+      margin: 0 0 6px;
+      color: #1e293b;
+      font-size: 17px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    body[data-page="admin-dashboard"] .card-subtitle {
+      margin: 0;
+      color: var(--admin-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    body[data-page="admin-dashboard"] .card-meta-right {
+      color: #475569;
+      background: #f1f5f9;
+      border-radius: 20px;
+      padding: 6px 11px;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    body[data-page="admin-dashboard"] .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    body[data-page="admin-dashboard"] .form-control {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      color: #1e293b;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      font-size: 14px;
+    }
+
+    body[data-page="admin-dashboard"] .form-control:focus {
+      outline: 0;
+      border-color: var(--admin-primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+
+    body[data-page="admin-dashboard"] .commission-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, .9fr) minmax(300px, 1.1fr);
+      gap: 20px;
+      align-items: end;
+    }
+
+    body[data-page="admin-dashboard"] .commission-input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    body[data-page="admin-dashboard"] .commission-input-group .form-control {
+      max-width: 180px;
+    }
+
+    body[data-page="admin-dashboard"] .commission-preview-box {
+      padding: 16px 18px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      border-radius: 9px;
+    }
+
+    body[data-page="admin-dashboard"] .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      min-height: 38px;
+      padding: 9px 13px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+
+    body[data-page="admin-dashboard"] .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    body[data-page="admin-dashboard"] .btn-primary {
+      background: var(--admin-primary);
+      border-color: var(--admin-primary);
+      color: #fff;
+    }
+
+    body[data-page="admin-dashboard"] .btn-primary:hover {
+      background: var(--admin-primary-dark);
+      border-color: var(--admin-primary-dark);
+    }
+
+    body[data-page="admin-dashboard"] .btn-block {
+      width: 100%;
+    }
+
+    body[data-page="admin-dashboard"] .btn-accept {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #047857;
+    }
+
+    body[data-page="admin-dashboard"] .btn-accept:hover {
+      background: #d1fae5;
+    }
+
+    body[data-page="admin-dashboard"] .btn-reject {
+      background: #fff1f2;
+      border-color: #fecdd3;
+      color: #be123c;
+    }
+
+    body[data-page="admin-dashboard"] .btn-reject:hover {
+      background: #ffe4e6;
+    }
+
+    body[data-page="admin-dashboard"] .btn-outline-primary {
+      color: var(--admin-primary);
+      background: #fff;
+      border-color: #bfdbfe;
+    }
+
+    body[data-page="admin-dashboard"] .btn-outline-primary:hover {
+      background: #eff6ff;
+    }
+
+    body[data-page="admin-dashboard"] .form-hint {
+      color: var(--admin-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    body[data-page="admin-dashboard"] .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    body[data-page="admin-dashboard"] .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    body[data-page="admin-dashboard"] .data-table th {
+      padding: 12px 14px;
+      color: #64748b;
+      background: #f8fafc;
+      border-top: 1px solid var(--admin-border);
+      border-bottom: 1px solid var(--admin-border);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    body[data-page="admin-dashboard"] .data-table th:first-child {
+      border-radius: 8px 0 0 0;
+    }
+
+    body[data-page="admin-dashboard"] .data-table th:last-child {
+      border-radius: 0 8px 0 0;
+    }
+
+    body[data-page="admin-dashboard"] .data-table td {
+      padding: 14px;
+      color: #475569;
+      border-bottom: 1px solid #edf1f5;
+      vertical-align: middle;
+    }
+
+    body[data-page="admin-dashboard"] .data-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    body[data-page="admin-dashboard"] .cell-primary {
+      display: block;
+      color: #1e293b;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    body[data-page="admin-dashboard"] .cell-secondary {
+      display: block;
+      margin-top: 3px;
+      color: #94a3b8;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    body[data-page="admin-dashboard"] .preview-doc-link {
+      color: var(--admin-primary);
+      font-size: 12px;
+    }
+
+    body[data-page="admin-dashboard"] .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 20px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    body[data-page="admin-dashboard"] .badge-role,
+    body[data-page="admin-dashboard"] .badge-info {
+      color: #1d4ed8;
+      background: #dbeafe;
+    }
+
+    body[data-page="admin-dashboard"] .badge-pending {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    body[data-page="admin-dashboard"] .action-btns {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    body[data-page="admin-dashboard"] .dispute-split-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    body[data-page="admin-dashboard"] .row-clickable {
+      cursor: pointer;
+    }
+
+    body[data-page="admin-dashboard"] .row-clickable:hover {
+      background: #f8fafc;
+    }
+
+    body[data-page="admin-dashboard"] .row-selected {
+      background: #eff6ff;
+    }
+
+    body[data-page="admin-dashboard"] .dispute-detail-card {
+      padding: 18px;
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      background: #fbfdff;
+    }
+
+    body[data-page="admin-dashboard"] .complaint-box {
+      margin: 16px 0;
+      padding: 13px 14px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+    }
+
+    body[data-page="admin-dashboard"] .saved-conv-box {
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+    }
+
+    body[data-page="admin-dashboard"] .saved-msg-item {
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #fff;
+      border: 1px solid #e8edf3;
+      border-radius: 7px;
+      color: #475569;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    body[data-page="admin-dashboard"] .saved-msg-item:last-child {
+      margin-bottom: 0;
+    }
+
+    body[data-page="admin-dashboard"] .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(15,23,42,.55);
+    }
+
+    body[data-page="admin-dashboard"] .modal-dialog {
+      width: min(100%, 520px);
+      padding: 24px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(15,23,42,.2);
+    }
+
+    body[data-page="admin-dashboard"] .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 12px;
+    }
+
+    body[data-page="admin-dashboard"] .modal-close {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 7px;
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1050px) {
+      body[data-page="admin-dashboard"] .sidebar {
+        width: 220px;
+      }
+
+      body[data-page="admin-dashboard"] .dashboard-content {
+        padding: 24px 20px 40px;
+      }
+
+      body[data-page="admin-dashboard"] .dispute-split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body[data-page="admin-dashboard"] .app-shell {
+        display: block;
+      }
+
+      body[data-page="admin-dashboard"] .sidebar {
+        width: 100%;
+        padding: 12px;
+      }
+
+      body[data-page="admin-dashboard"] .sidebar-brand {
+        padding: 4px 8px 12px;
+        margin-bottom: 12px;
+      }
+
+      body[data-page="admin-dashboard"] .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      body[data-page="admin-dashboard"] .sidebar-link {
+        flex: 0 0 auto;
+        padding: 9px 11px;
+        font-size: 12px;
+      }
+
+      body[data-page="admin-dashboard"] .sidebar-footer {
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+
+      body[data-page="admin-dashboard"] .topbar {
+        padding: 12px 16px;
+      }
+
+      body[data-page="admin-dashboard"] .dashboard-content {
+        padding: 20px 14px 32px;
+      }
+
+      body[data-page="admin-dashboard"] .card {
+        padding: 17px;
+      }
+
+      body[data-page="admin-dashboard"] .commission-grid {
+        grid-template-columns: 1fr;
+      }
+
+      body[data-page="admin-dashboard"] .card-header {
+        flex-direction: column;
+      }
+
+      body[data-page="admin-dashboard"] .action-btns {
+        min-width: 160px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body[data-page="admin-dashboard"] .topbar-user-name {
+        display: none;
+      }
+
+      body[data-page="admin-dashboard"] .topbar {
+        min-height: 62px;
+      }
+
+      body[data-page="admin-dashboard"] .commission-input-group {
+        flex-direction: column;
+      }
+
+      body[data-page="admin-dashboard"] .commission-input-group .form-control {
+        max-width: none;
+      }
+
+      body[data-page="admin-dashboard"] .commission-input-group .btn {
+        width: 100%;
+      }
+
+      body[data-page="admin-dashboard"] .dispute-detail-card {
+        padding: 13px;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="admin-dashboard">
 
   <div class="app-shell">
-    <!-- ======================================================================
-         1. DARK LEFT SIDEBAR NAVIGATION (Matches Admin Figma Design)
-         ====================================================================== -->
     <aside class="sidebar sidebar-dark">
       <div class="sidebar-brand">
         <a href="index.html" class="brand-logo brand-logo-light">
@@ -98,11 +686,7 @@
       </div>
     </aside>
 
-    <!-- ======================================================================
-         2. MAIN CONTENT AREA
-         ====================================================================== -->
     <div class="main-wrapper">
-      <!-- Top Header Bar -->
       <header class="topbar">
         <div class="topbar-title">Dashboard</div>
         <div class="topbar-user">
@@ -120,11 +704,6 @@
           </p>
         </div>
 
-        <!-- ==================================================================
-             FEATURE 12: PLATFORM COMMISSION MANAGEMENT
-             Future PHP Note: Update the COMMISSION table with the new
-             commission_rate, effective_date, and updated_by_admin_user_id.
-             ================================================================== -->
         <section id="commissionCard" class="card" aria-labelledby="commissionHeading">
           <div class="card-header">
             <div>
@@ -168,11 +747,6 @@
           </p>
         </section>
 
-        <!-- ==================================================================
-             FEATURE 10: USER & LISTING VERIFICATION
-             Future PHP Note: Update status ('Approved' or 'Rejected') in the
-             HOMESTAY, GUIDE_PORTFOLIO, or TOUR_PACKAGE database tables.
-             ================================================================== -->
         <section id="verificationsCard" class="card" aria-labelledby="verificationsHeading">
           <div class="card-header">
             <div>
@@ -196,7 +770,6 @@
                 </tr>
               </thead>
               <tbody id="verificationsTableBody">
-                <!-- Submission 1 -->
                 <tr>
                   <td>
                     <span class="cell-primary">Host Listing</span>
@@ -227,7 +800,6 @@
                   </td>
                 </tr>
 
-                <!-- Submission 2 -->
                 <tr>
                   <td>
                     <span class="cell-primary">Guide Certificate</span>
@@ -258,7 +830,6 @@
                   </td>
                 </tr>
 
-                <!-- Submission 3 -->
                 <tr>
                   <td>
                     <span class="cell-primary">Tour Package</span>
@@ -293,11 +864,6 @@
           </div>
         </section>
 
-        <!-- ==================================================================
-             FEATURE 11: BOOKING DISPUTE MANAGEMENT
-             Future PHP Note: Fetch COMPLAINT, BOOKING, and MESSAGE records by
-             booking_id and update COMPLAINT.status and COMPLAINT.resolution.
-             ================================================================== -->
         <section id="disputesCard" class="card" aria-labelledby="disputesHeading">
           <div class="card-header">
             <div>
@@ -310,7 +876,6 @@
           </div>
 
           <div class="dispute-split-grid">
-            <!-- Left Column: Active Disputes Table -->
             <div>
               <h3 style="font-size: 0.825rem; font-weight: 700; margin-bottom: 10px;">
                 Active disputes
@@ -326,7 +891,6 @@
                     </tr>
                   </thead>
                   <tbody id="disputesTableBody">
-                    <!-- Dispute 1 (Selected by default) -->
                     <tr class="row-clickable row-selected" data-dispute-id="DSP-1042" style="border-left: 3px solid var(--primary);">
                       <td>
                         <span class="cell-primary" style="color: var(--primary);">DSP-1042</span>
@@ -340,7 +904,6 @@
                       <td>Airport pickup not provided</td>
                     </tr>
 
-                    <!-- Dispute 2 -->
                     <tr class="row-clickable" data-dispute-id="DSP-1041">
                       <td>
                         <span class="cell-primary">DSP-1041</span>
@@ -354,7 +917,6 @@
                       <td>Tour itinerary changed</td>
                     </tr>
 
-                    <!-- Dispute 3 -->
                     <tr class="row-clickable" data-dispute-id="DSP-1039">
                       <td>
                         <span class="cell-primary">DSP-1039</span>
@@ -376,7 +938,6 @@
               </p>
             </div>
 
-            <!-- Right Column: Selected Dispute Details & Resolution Panel -->
             <div class="dispute-detail-card">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                 <h3 id="detailDisputeId" style="font-size: 0.95rem; font-weight: 800;">DSP-1042</h3>
@@ -393,7 +954,6 @@
                 Tanvir Ahmed (Traveler) &middot; Meherunnissa Ponni (Host)
               </div>
 
-              <!-- Complaint Reason Box -->
               <div class="complaint-box">
                 <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 2px;">
                   Complaint reason
@@ -406,13 +966,11 @@
                 </p>
               </div>
 
-              <!-- Saved Negotiation Conversation Header -->
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                 <span style="font-size: 0.78rem; font-weight: 700;">Saved negotiation conversation</span>
                 <span id="detailMsgCount" class="card-meta-right">4 messages</span>
               </div>
 
-              <!-- Saved Messages Scrollable Box -->
               <div id="detailMessagesBox" class="saved-conv-box">
                 <div class="saved-msg-item">
                   <div style="font-weight: 700;">Tanvir Ahmed &middot; Traveler</div>
@@ -443,7 +1001,6 @@
                 &#8964; More saved messages below &middot; Read-only history
               </div>
 
-              <!-- Dispute Resolution Action Buttons -->
               <div style="display: flex; flex-direction: column; gap: 8px;">
                 <button type="button" id="resolveTravelerBtn" class="btn btn-outline-primary btn-block">
                   Resolve for Traveler (Refund)
@@ -463,7 +1020,6 @@
     </div>
   </div>
 
-  <!-- Document / Photo Preview Modal for Verification Table -->
   <div id="docPreviewModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="docModalTitle">
     <div class="modal-dialog">
       <div class="modal-header">

@@ -1,34 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!--
-    ==========================================================================
-    PAGE 4: ACCOUNT & PROFILE SETTINGS (profile-settings.html)
-    Project: Local Nest - Integrated Homestay & Local Experience Booking Platform
-    Course: CSC 3215: Web Technologies (AIUB)
-    Description:
-    Common Account Management page available to all 4 user types (Traveler,
-    Host, Local Guide, and Admin).
-    Features:
-      1. Manage Profile Information (Full Name, Email, Phone, and Photo Upload
-         with live client-side image preview and 2 MB size validation).
-      2. Change / Reset Password (validates current password, minimum 8 chars,
-         and confirmation match).
-    Future PHP Note: Handle profile photo upload using $_FILES['profile_photo']
-    and move_uploaded_file(), and update password hash in the USER table.
-    ==========================================================================
-  -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Account &amp; Profile Settings — Localnest</title>
   <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    :root {
+      --profile-primary: #2563eb;
+      --profile-primary-dark: #1d4ed8;
+      --profile-bg: #f5f7fb;
+      --profile-surface: #ffffff;
+      --profile-text: #172033;
+      --profile-muted: #64748b;
+      --profile-border: #e2e8f0;
+      --profile-sidebar: #17243a;
+      --profile-sidebar-hover: #243650;
+      --profile-radius: 12px;
+      --profile-shadow: 0 4px 18px rgba(15, 23, 42, .05);
+    }
+
+    body[data-page="profile"] {
+      margin: 0;
+      background: var(--profile-bg);
+      color: var(--profile-text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    body[data-page="profile"] * {
+      box-sizing: border-box;
+    }
+
+    body[data-page="profile"] .app-shell {
+      min-height: 100vh;
+    }
+
+    body[data-page="profile"] .sidebar {
+      width: 250px;
+      background: var(--profile-sidebar);
+      color: #e2e8f0;
+      padding: 24px 16px;
+    }
+
+    body[data-page="profile"] .sidebar-brand {
+      padding: 0 12px 28px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 22px;
+    }
+
+    body[data-page="profile"] .brand-logo {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    body[data-page="profile"] .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    body[data-page="profile"] .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background .2s, color .2s;
+    }
+
+    body[data-page="profile"] .sidebar-link svg {
+      width: 19px;
+      height: 19px;
+      flex: 0 0 19px;
+    }
+
+    body[data-page="profile"] .sidebar-link:hover,
+    body[data-page="profile"] .sidebar-link.active {
+      color: #fff;
+      background: var(--profile-sidebar-hover);
+    }
+
+    body[data-page="profile"] .sidebar-link.active {
+      box-shadow: inset 3px 0 #60a5fa;
+    }
+
+    body[data-page="profile"] .sidebar-footer {
+      margin-top: auto;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    body[data-page="profile"] .main-wrapper {
+      min-width: 0;
+      flex: 1;
+    }
+
+    body[data-page="profile"] .topbar {
+      min-height: 72px;
+      padding: 14px 32px;
+      background: #fff;
+      border-bottom: 1px solid var(--profile-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    body[data-page="profile"] .topbar-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--profile-text);
+    }
+
+    body[data-page="profile"] .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    body[data-page="profile"] .topbar-user-name {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    body[data-page="profile"] .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    body[data-page="profile"] .avatar-lg {
+      width: 76px;
+      height: 76px;
+      font-size: 23px;
+    }
+
+    body[data-page="profile"] .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    body[data-page="profile"] .badge-role {
+      color: #1d4ed8;
+      background: #dbeafe;
+    }
+
+    body[data-page="profile"] .dashboard-content {
+      width: min(100%, 1400px);
+      margin: 0 auto;
+      padding: 30px 32px 48px;
+    }
+
+    body[data-page="profile"] .page-header {
+      margin-bottom: 25px;
+    }
+
+    body[data-page="profile"] .page-title {
+      margin: 0 0 7px;
+      color: #172033;
+      font-size: clamp(24px, 3vw, 30px);
+      line-height: 1.25;
+      font-weight: 750;
+    }
+
+    body[data-page="profile"] .page-subtitle {
+      margin: 0;
+      color: var(--profile-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    body[data-page="profile"] .grid-2-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+
+    body[data-page="profile"] .card {
+      min-width: 0;
+      padding: 24px;
+      background: var(--profile-surface);
+      border: 1px solid var(--profile-border);
+      border-radius: var(--profile-radius);
+      box-shadow: var(--profile-shadow);
+    }
+
+    body[data-page="profile"] .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    body[data-page="profile"] .card-title {
+      margin: 0 0 6px;
+      color: #1e293b;
+      font-size: 17px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    body[data-page="profile"] .card-subtitle {
+      margin: 0;
+      color: var(--profile-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    body[data-page="profile"] .form-group {
+      margin-bottom: 18px;
+    }
+
+    body[data-page="profile"] .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    body[data-page="profile"] .form-control {
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 13px;
+      color: #1e293b;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      font-size: 14px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    body[data-page="profile"] .form-control::placeholder {
+      color: #94a3b8;
+    }
+
+    body[data-page="profile"] .form-control:focus {
+      outline: none;
+      border-color: var(--profile-primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+
+    body[data-page="profile"] .form-hint {
+      display: block;
+      margin-top: 6px;
+      color: var(--profile-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    body[data-page="profile"] .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 16px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+
+    body[data-page="profile"] .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    body[data-page="profile"] .btn-primary {
+      color: #fff;
+      background: var(--profile-primary);
+      border-color: var(--profile-primary);
+    }
+
+    body[data-page="profile"] .btn-primary:hover {
+      background: var(--profile-primary-dark);
+      border-color: var(--profile-primary-dark);
+    }
+
+    body[data-page="profile"] .btn-outline {
+      color: var(--profile-primary);
+      background: #fff;
+      border-color: #bfdbfe;
+    }
+
+    body[data-page="profile"] .btn-outline:hover {
+      background: #eff6ff;
+    }
+
+    body[data-page="profile"] .file-input-name {
+      color: #64748b;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    body[data-page="profile"] .status-banner {
+      padding: 11px 14px;
+      margin-bottom: 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    body[data-page="profile"] .status-banner.success {
+      color: #047857;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+    }
+
+    body[data-page="profile"] .status-banner.error {
+      color: #be123c;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+    }
+
+    body[data-page="profile"] input[type="file"] {
+      font-size: 13px;
+    }
+
+    @media (max-width: 1000px) {
+      body[data-page="profile"] .grid-2-col {
+        grid-template-columns: 1fr;
+      }
+
+      body[data-page="profile"] .dashboard-content {
+        padding: 24px 20px 40px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body[data-page="profile"] .app-shell {
+        display: block;
+      }
+
+      body[data-page="profile"] .sidebar {
+        width: 100%;
+        padding: 12px;
+      }
+
+      body[data-page="profile"] .sidebar-brand {
+        padding: 4px 8px 12px;
+        margin-bottom: 12px;
+      }
+
+      body[data-page="profile"] .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      body[data-page="profile"] .sidebar-link {
+        flex: 0 0 auto;
+        padding: 9px 11px;
+        font-size: 12px;
+      }
+
+      body[data-page="profile"] .sidebar-footer {
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+
+      body[data-page="profile"] .topbar {
+        padding: 12px 16px;
+      }
+
+      body[data-page="profile"] .dashboard-content {
+        padding: 20px 14px 32px;
+      }
+
+      body[data-page="profile"] .card {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body[data-page="profile"] .topbar-user-name {
+        display: none;
+      }
+
+      body[data-page="profile"] .topbar {
+        min-height: 62px;
+      }
+
+      body[data-page="profile"] .avatar-lg {
+        width: 62px;
+        height: 62px;
+        font-size: 20px;
+      }
+
+      body[data-page="profile"] .btn {
+        width: 100%;
+      }
+
+      body[data-page="profile"] #profileInfoForm > div:first-of-type .btn {
+        width: auto;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="profile">
 
   <div class="app-shell">
-    <!-- ======================================================================
-         1. LEFT SIDEBAR NAVIGATION
-         ====================================================================== -->
     <aside class="sidebar">
       <div class="sidebar-brand">
         <a href="index.html" class="brand-logo">
@@ -43,7 +438,6 @@
       </div>
 
       <nav class="sidebar-nav" aria-label="Profile Sidebar Navigation">
-        <!-- Dynamically points to the active user's role dashboard via JS -->
         <a href="traveler-dashboard.html" id="backToDashboardLink" class="sidebar-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="19" y1="12" x2="5" y2="12"/>
@@ -73,11 +467,7 @@
       </div>
     </aside>
 
-    <!-- ======================================================================
-         2. MAIN CONTENT AREA (TOPBAR + TWO-COLUMN SETTINGS CARDS)
-         ====================================================================== -->
     <div class="main-wrapper">
-      <!-- Top Header Bar -->
       <header class="topbar">
         <div class="topbar-title">Profile Settings</div>
         <div class="topbar-user">
@@ -87,7 +477,6 @@
         </div>
       </header>
 
-      <!-- Main Page Body -->
       <main class="dashboard-content">
         <div class="page-header">
           <h1 class="page-title">Account &amp; Profile Settings</h1>
@@ -97,9 +486,6 @@
         </div>
 
         <div class="grid-2-col">
-          <!-- ================================================================
-               LEFT CARD: MANAGE PROFILE INFORMATION
-               ================================================================ -->
           <section class="card" aria-labelledby="manageProfileHeading">
             <div class="card-header">
               <div>
@@ -108,11 +494,9 @@
               </div>
             </div>
 
-            <!-- Feedback Banner for Profile Form -->
             <div id="profileStatusBanner" class="status-banner" style="display: none;" role="status"></div>
 
             <form id="profileInfoForm" novalidate>
-              <!-- Avatar & Photo Upload Row -->
               <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
                 <div id="profilePreviewAvatar" class="avatar-circle avatar-lg">AI</div>
                 <div>
@@ -169,9 +553,6 @@
             </form>
           </section>
 
-          <!-- ================================================================
-               RIGHT CARD: CHANGE / RESET PASSWORD
-               ================================================================ -->
           <section class="card" aria-labelledby="changePasswordHeading">
             <div class="card-header">
               <div>
@@ -180,7 +561,6 @@
               </div>
             </div>
 
-            <!-- Feedback Banner for Password Form -->
             <div id="passwordStatusBanner" class="status-banner" style="display: none;" role="status"></div>
 
             <form id="changePasswordForm" novalidate>
