@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!--
-    ==========================================================================
-    PAGE 3: REGISTRATION PAGE (register.html)
-    Project: Local Nest - Integrated Homestay & Local Experience Booking Platform
-    Course: CSC 3215: Web Technologies (AIUB)
-    Description:
-    Role-based user registration page allowing new users to sign up as a
-    Traveler (Guest), Host (Homestay Owner), or Local Tour Guide.
-    Includes client-side form validation in js/main.js.
-    Future PHP Note: Process POST data in PHP, validate uniqueness of email in
-    the USER table, hash password with password_hash(), and insert record.
-    ==========================================================================
-  -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create an Account — Localnest</title>
@@ -21,9 +8,6 @@
 </head>
 <body class="auth-page" data-page="register">
 
-  <!-- ========================================================================
-       1. MINIMAL AUTH HEADER
-       ======================================================================== -->
   <header class="auth-header">
     <a href="index.html" class="brand-logo">
       <span class="brand-logo-icon">
@@ -37,18 +21,13 @@
     <a href="index.html" class="auth-header-link">Back to Home</a>
   </header>
 
-  <!-- ========================================================================
-       2. CENTERED REGISTRATION CARD
-       ======================================================================== -->
   <main class="auth-main">
     <section class="auth-card auth-card-wide" aria-labelledby="registerHeading">
       <h1 id="registerHeading" class="auth-title">Create an Account</h1>
       <p class="auth-subtitle">Join as a Traveler, Host, or Local Tour Guide</p>
 
-      <!-- Dynamic Validation Status Message Box (hidden until submit) -->
       <div id="registerStatusBanner" class="status-banner" style="display: none;" role="alert"></div>
 
-      <!-- Registration Form -->
       <form id="registerForm" novalidate>
         <div class="form-group">
           <label for="regFullName" class="form-label">Full Name</label>
@@ -74,7 +53,6 @@
           />
         </div>
 
-        <!-- Role Selection Dropdown (Matches "Role selection expanded state.png") -->
         <div class="form-group">
           <label for="regRole" class="form-label">Select Your Role</label>
           <select id="regRole" name="role" class="form-control" required>
@@ -84,7 +62,6 @@
           </select>
         </div>
 
-        <!-- Password & Confirm Password Side-by-Side Row -->
         <div class="form-row-2">
           <div class="form-group">
             <label for="regPassword" class="form-label">Password</label>

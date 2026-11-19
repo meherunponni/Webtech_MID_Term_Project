@@ -1,21 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!--
-    ==========================================================================
-    PAGE 5: TRAVELER (GUEST) DASHBOARD (traveler-dashboard.html)
-    Project: Local Nest - Integrated Homestay & Local Experience Booking Platform
-    Course: CSC 3215: Web Technologies (AIUB)
-    Description:
-    Implements the 3 core Traveler (Guest) features from the project proposal:
-      1. Smart Itinerary Builder (JavaScript DOM manipulation to add/remove
-         homestays and tours organized by trip day).
-      2. AJAX Booking Negotiation (Asynchronous messaging and price offer
-         system with hosts and guides without reloading the page).
-      3. Split Cost Calculator (Automatically totals homestays + tours and
-         calculates per-person cost based on number of participants).
-    ==========================================================================
-  -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Traveler Dashboard — Localnest</title>
@@ -24,9 +9,6 @@
 <body data-page="traveler-dashboard">
 
   <div class="app-shell">
-    <!-- ======================================================================
-         1. LEFT SIDEBAR NAVIGATION
-         ====================================================================== -->
     <aside class="sidebar">
       <div class="sidebar-brand">
         <a href="index.html" class="brand-logo">
@@ -97,11 +79,7 @@
       </div>
     </aside>
 
-    <!-- ======================================================================
-         2. MAIN CONTENT AREA
-         ====================================================================== -->
     <div class="main-wrapper">
-      <!-- Top Header Bar -->
       <header class="topbar">
         <div class="topbar-title">Dashboard</div>
         <div class="topbar-user">
@@ -119,12 +97,8 @@
           </p>
         </div>
 
-        <!-- ==================================================================
-             TOP ROW: SMART ITINERARY BUILDER (LEFT) & SPLIT COST CALCULATOR (RIGHT)
-             ================================================================== -->
         <div class="grid-traveler-top">
 
-          <!-- FEATURE 1: SMART ITINERARY BUILDER -->
           <section id="itineraryBuilderCard" class="card" aria-labelledby="itineraryHeading">
             <div class="card-header">
               <div>
@@ -135,7 +109,6 @@
               </div>
             </div>
 
-            <!-- Add to Itinerary Controls -->
             <form id="addItineraryForm" class="itinerary-controls" novalidate>
               <div>
                 <label for="savedListingSelect" class="form-label">Saved destination / listing</label>
@@ -171,9 +144,7 @@
               <button type="submit" class="btn btn-primary">+ Add to Itinerary</button>
             </form>
 
-            <!-- Dynamic Timeline List (Manipulated via JavaScript DOM methods) -->
             <div id="itineraryTimeline" class="itinerary-timeline">
-              <!-- Item 1 -->
               <div class="itinerary-item" data-day="1" data-type="Homestay" data-price="240">
                 <span class="day-pill">Day 1</span>
                 <div>
@@ -187,7 +158,6 @@
                 <button type="button" class="btn btn-remove btn-remove-itinerary">Remove</button>
               </div>
 
-              <!-- Item 2 -->
               <div class="itinerary-item" data-day="2" data-type="Tour" data-price="120">
                 <span class="day-pill">Day 2</span>
                 <div>
@@ -201,7 +171,6 @@
                 <button type="button" class="btn btn-remove btn-remove-itinerary">Remove</button>
               </div>
 
-              <!-- Item 3 -->
               <div class="itinerary-item" data-day="3" data-type="Homestay" data-price="160">
                 <span class="day-pill">Day 3</span>
                 <div>
@@ -215,7 +184,6 @@
                 <button type="button" class="btn btn-remove btn-remove-itinerary">Remove</button>
               </div>
 
-              <!-- Item 4 -->
               <div class="itinerary-item" data-day="3" data-type="Tour" data-price="80">
                 <span class="day-pill">Day 3</span>
                 <div>
@@ -231,7 +199,6 @@
             </div>
           </section>
 
-          <!-- FEATURE 3: SPLIT COST CALCULATOR -->
           <section class="card" aria-labelledby="splitCostHeading">
             <div class="card-header">
               <div>
@@ -240,7 +207,6 @@
               </div>
             </div>
 
-            <!-- Homestays Total Row (Auto-synced with itinerary + editable) -->
             <div class="cost-input-row">
               <span>Homestays Total (&#2547;)</span>
               <input
@@ -253,7 +219,6 @@
               />
             </div>
 
-            <!-- Tours Total Row (Auto-synced with itinerary + editable) -->
             <div class="cost-input-row" style="margin-bottom: 16px;">
               <span>Tours Total (&#2547;)</span>
               <input
@@ -266,7 +231,6 @@
               />
             </div>
 
-            <!-- Number of Participants -->
             <div class="form-group">
               <label for="participantsInput" class="form-label">Number of Participants</label>
               <input
@@ -279,7 +243,6 @@
               />
             </div>
 
-            <!-- Calculated Summary Box -->
             <div class="split-summary-box">
               <div class="split-summary-row">
                 <span>Total Trip Cost</span>
@@ -297,11 +260,6 @@
           </section>
         </div>
 
-        <!-- ==================================================================
-             BOTTOM ROW: FEATURE 2 — AJAX BOOKING NEGOTIATION
-             Future PHP Note: Send message & offer via fetch('api/negotiate.php')
-             and store in MESSAGE / NEGOTIATION table linked to booking_id.
-             ================================================================== -->
         <section id="ajaxNegotiationCard" class="card" aria-labelledby="negotiationHeading">
           <div class="card-header">
             <div>
@@ -313,14 +271,12 @@
           </div>
 
           <div class="negotiation-grid">
-            <!-- Left Column: Active Conversations List -->
             <div>
               <div class="conv-list-header">
                 <span>Active conversations</span>
                 <span id="activeConvCount">3</span>
               </div>
 
-              <!-- Conversation 1: Meherunnissa Ponni -->
               <div class="conv-item active" data-conv-id="meherunnissa">
                 <div class="conv-item-top">
                   <div class="avatar-circle">MP</div>
@@ -336,7 +292,6 @@
                 <div class="conv-preview" data-conv-preview="meherunnissa">Happy to consider an offer.</div>
               </div>
 
-              <!-- Conversation 2: Jemam Bin Islam -->
               <div class="conv-item" data-conv-id="jemam">
                 <div class="conv-item-top">
                   <div class="avatar-circle">JI</div>
@@ -352,7 +307,6 @@
                 <div class="conv-preview" data-conv-preview="jemam">We can start at 8 AM.</div>
               </div>
 
-              <!-- Conversation 3: Farzana Rahman -->
               <div class="conv-item" data-conv-id="farzana">
                 <div class="conv-item-top">
                   <div class="avatar-circle">FR</div>
@@ -369,9 +323,7 @@
               </div>
             </div>
 
-            <!-- Right Column: Active Chat Window & AJAX Offer Form -->
             <div class="chat-panel">
-              <!-- Chat Header -->
               <div class="chat-header">
                 <div class="chat-header-left">
                   <div id="chatHeaderAvatar" class="avatar-circle">MP</div>
@@ -390,7 +342,6 @@
                 </div>
               </div>
 
-              <!-- Chat Messages Container -->
               <div id="chatMessagesContainer" class="chat-messages" aria-live="polite">
                 <div class="chat-day-divider">Today</div>
 
@@ -409,7 +360,6 @@
                 </div>
               </div>
 
-              <!-- AJAX Message & Offer Composer -->
               <form id="ajaxNegotiationForm" class="chat-composer" novalidate>
                 <div class="chat-composer-grid">
                   <div>
